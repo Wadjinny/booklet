@@ -1,0 +1,6 @@
+booklet.w-ilyas.ink, booklet.w-ilyas.site {
+	encode gzip
+	root * /home/ubuntu/thinkering/booklet
+	try_files {path} /index.html
+	file_server
+}

@@ -18,23 +18,35 @@ Pick 2, 4, 8 or 16 booklet pages per side of the paper, preview every sheet (fro
 
 ## Run
 
-Requires Node.js 20+.
+Requires Node.js 20+ and pnpm. The app lives in `frontend/`.
 
 ```bash
-npm install
-npm run dev        # dev server at http://localhost:5173
+cd frontend
+pnpm install
+pnpm dev           # dev server at http://localhost:5173
 ```
 
-Production build (static files in `dist/`, host them anywhere):
+Production build (static files in `frontend/dist/`):
 
 ```bash
-npm run build
-npm run preview    # serve the build at http://localhost:4173
+pnpm build
+pnpm preview       # serve the build at http://localhost:4173
 ```
+
+## Deploy
+
+Pushing to `main` runs `.github/workflows/deploy.yml`, which uses the shared [Wadjinny/workflows](https://github.com/Wadjinny/workflows):
+
+1. `deploy-pnpm-vite.yml` builds `frontend/` and rsyncs `dist/` to `$SSH_DEPLOY_DIR/booklet` on the VPS.
+2. `deploy-caddy-site.yml` installs `Caddyfile` as `/etc/caddy/sites/booklet.conf` and reloads Caddy.
+
+Live at https://booklet.w-ilyas.site and https://booklet.w-ilyas.ink.
+
+Required repo secrets: `SSH_HOST`, `SSH_USER`, `SSH_KEY`, `SSH_DEPLOY_DIR` (see `ignored/secrets.env.example` in the workflows repo).
 
 ## How it works
 
-- `src/lib/plan.js` computes the imposition: grid choice, page order per strip, front/back placement for the chosen duplex flip edge, and the cut & stack order.
-- `src/lib/build.js` writes the output PDF with [pdf-lib](https://pdf-lib.js.org/). Source pages are embedded as vectors, so text stays sharp.
-- `src/lib/render.js` renders the preview with [pdf.js](https://mozilla.github.io/pdf.js/).
-- UI: Vue 3 + Vite (`src/App.vue`, `src/components/`).
+- `frontend/src/lib/plan.js` computes the imposition: grid choice, page order per strip, front/back placement for the chosen duplex flip edge, and the cut & stack order.
+- `frontend/src/lib/build.js` writes the output PDF with [pdf-lib](https://pdf-lib.js.org/). Source pages are embedded as vectors, so text stays sharp.
+- `frontend/src/lib/render.js` renders the preview with [pdf.js](https://mozilla.github.io/pdf.js/).
+- UI: Vue 3 + Vite (`frontend/src/App.vue`, `frontend/src/components/`).
